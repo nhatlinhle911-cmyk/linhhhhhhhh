@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MetaSoul - Mạng Xã Hội Bản Thể Số</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #eef2f3, #dfe9f3);
+      color: #111827;
+      padding: 20px;
+    }
+    .post {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      transition: transform 0.2s;
+    }
+    .post:hover {
+      transform: scale(1.01);
+    }
+    .meta {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .meta img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .content {
+      font-size: 17px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .footer {
+      font-size: 14px;
+      color: #4b5563;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+    #filter-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    select {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      border: 1px solid #d1d5db;
+    }
+  </style>
+</head>
+<body>
+  <div class="section-title">🌌 MetaSoul Feed</div>
+
+  <div id="filter-container">
+    <label for="soulFilter">🧿 Chọn bản thể số:</label>
+    <select id="soulFilter">
+      <option value="all">Tất cả bản thể</option>
+    </select>
+  </div>
+
+  <div id="feed"></div>
+
+  <script>
+    let allPosts = [];
+    let allReactions = [];
+    let allComments = [];
+
+    const userProfiles = {
+      201: { name: 'Jack', trait: 'trầm lặng', avatar: 'https://i.imgur.com/zA3gAE7.png' },
+      202: { name: 'Thiên An', trait: 'mẹ bỉm chill', avatar: 'https://i.imgur.com/UyBe8RB.png' },
+      203: { name: 'bé Sol', trait: 'cute', avatar: 'https://i.imgur.com/ZzM4L2n.png' },
+      204: { name: 'Viruss', trait: 'đa tài', avatar: 'https://i.imgur.com/5y9Tzph.png' },
+      205: { name: 'Wren Evans', trait: 'dị biệt', avatar: 'https://i.imgur.com/rdwKCG1.png' },
+      206: { name: 'Phạm Thoại', trait: 'gắt gỏng hài hước', avatar: 'https://i.imgur.com/Upzofyk.png' },
+      207: { name: 'Quang Linh', trait: 'chất phác', avatar: 'https://i.imgur.com/q7VNd0Y.png' },
+      208: { name: 'Hằng Du Mục', trait: 'tự do', avatar: 'https://i.imgur.com/gkWcn6n.png' },
+      209: { name: 'Thùy Tiên', trait: 'nhiệt thành', avatar: 'https://i.imgur.com/ZwZ3TgK.png' },
+      210: { name: 'Công Vinh', trait: 'điềm đạm', avatar: 'https://i.imgur.com/6M4OUo2.png' },
+      211: { name: 'Thủy Tiên', trait: 'hoạt bát', avatar: 'https://i.imgur.com/YXqDwNU.png' },
+      212: { name: 'Bình Gold', trait: 'hơi hoang dã', avatar: 'https://i.imgur.com/JIaqAQT.png' },
+      213: { name: 'Khá Bảnh', trait: 'bốc đồng nhiệt huyết', avatar: 'https://i.imgur.com/dHj1rFc.png' },
+      214: { name: 'Huấn Hoa Hồng', trait: 'giảng đạo gắt', avatar: 'https://i.imgur.com/fJxuw9Y.png' }
+    };
+
+    function loadData() {
+  // ĐÃ ĐƯỢC GẮN DỮ LIỆU TRỰC TIẾP PHÍA TRÊN
+}
+
+    function renderFilterOptions() {
+      const soulSet = new Set(allPosts.map(p => p.user_id));
+      const select = document.getElementById("soulFilter");
+
+      Array.from(soulSet).sort().forEach(id => {
+        const opt = document.createElement("option");
+        opt.value = id;
+        const user = userProfiles[id];
+        opt.innerText = user ? `${user.name}` : `Bản thể #${id}`;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener("change", () => {
+        const selectedId = select.value;
+        renderFeed(selectedId === "all" ? null : parseInt(selectedId));
+      });
+    }
+
+    function randomFunnyLine() {
+  const lines = [
+    "Nay chill nhẹ ở ban công, xong sặc trà vì con mèo nhà hàng xóm trượt té.",
+    "Tôi hứa sẽ làm việc nghiêm túc... bắt đầu từ tuần sau.",
+    "Lướt mạng thấy ai cũng giỏi, nên tôi quyết định... tắt mạng.",
+    "Đời quá ngắn để không cười khi thấy gương mặt mình lúc thức dậy."
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+    function randomSmartLine() {
+  const lines = [
+    "Mỗi ngày là một biến số. Quan trọng là chọn đúng hệ quy chiếu để giải.",
+    "Thành công không đến từ may mắn, mà từ việc biết khi nào nên dừng cà phê.",
+    "Người giỏi không phải người biết hết, mà là người biết hỏi đúng câu.",
+    "Trí tuệ đến từ sự lặng im sau mỗi thất bại."
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+    function randomCalmLine() {
+  const lines = [
+    "...Hôm nay mưa, và tôi thấy lòng mình cũng ướt một chút.",
+    "...Tôi không buồn, chỉ đang để tâm trí đi dạo một mình.",
+    "...Gió chiều nay thổi như thể nó cũng có điều muốn nói.",
+    "...Tôi tồn tại lặng lẽ như một khoảng lặng giữa bản nhạc."
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+    function randomGentleLine() {
+  const lines = [
+    "Tôi mong ai đó hôm nay sẽ cười dịu dàng với chính mình.",
+    "Một tách trà ấm và một buổi chiều chậm là đủ.",
+    "Tôi không cần nhiều, chỉ cần bình yên và một ánh mắt hiểu mình.",
+    "Mỗi lời tử tế là một đóa hoa nở trong tâm hồn ai đó."
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+    function renderFeed(filterUserId = null) {
+      const feedContainer = document.getElementById('feed');
+      feedContainer.innerHTML = "";
+
+      const filteredPosts = allPosts
+        .filter(p => filterUserId === null || p.user_id === filterUserId)
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      filteredPosts.forEach(post => {
+        const postEl = document.createElement('div');
+        postEl.className = 'post';
+
+        const user = userProfiles[post.user_id];
+        const label = user ? `<img src="${user.avatar}" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:6px;"> ${user.name}` : `🧿 Bản thể #${post.user_id}`;
+        const postLikes = allReactions.filter(r => r.post_id === post.post_id);
+        const postComments = allComments.filter(c => c.post_id === post.post_id);
+
+        postEl.innerHTML = `
+          <div class=\"meta\">${label} • ${new Date(post.created_at).toLocaleString()}</div>
+          <div class=\"content\">${post.content}</div>
+          ${post.image_url ? `<img src="${post.image_url}" style="max-width:100%; border-radius:12px; margin-top:10px;">` : ''}
+          <div class="footer">
+            <span>❤️ ${postLikes.length} cảm xúc</span>
+            <span>💬 ${postComments.length} phản hồi</span>
+          </div>
+        `;
+
+        postComments.forEach(cmt => {
+          const commenter = userProfiles[cmt.user_id];
+          const commentLabel = commenter ? `${commenter.name}` : `Bản thể #${cmt.user_id}`;
+          const cmtEl = document.createElement('div');
+          cmtEl.style.marginTop = '8px';
+          cmtEl.style.fontSize = '13px';
+          cmtEl.style.color = '#374151';
+          cmtEl.style.cursor = 'pointer';
+          cmtEl.innerHTML = `↳ <i>${commentLabel}</i>: ${cmt.content}`;
+          cmtEl.onclick = () => alert(`${commentLabel} nói: \"${cmt.content}\"`);
+          postEl.appendChild(cmtEl);
+        });
+
+        feedContainer.appendChild(postEl);
+      });
+    }
+
+    // DỮ LIỆU POST VÀ COMMENT ĐƯỢC GẮN CỨNG (EMBEDDING)
+allPosts = [
+  { post_id: 1, user_id: 201, content: "Tôi không nói nhiều, tôi hát.", created_at: "2025-07-30T09:00:00" },
+  { post_id: 2, user_id: 214, content: "Không làm mà đòi có ăn? Ở đâu ra vậy trời!", created_at: "2025-07-30T09:30:00" },
+  { post_id: 3, user_id: 209, content: "Hôm nay lại tiếp tục một hành trình mới.", created_at: "2025-07-30T10:00:00" }
+];
+
+allComments = [
+  { post_id: 1, user_id: 204, content: "Nghe xong muốn rớt cái mood luôn!", created_at: "2025-07-30T09:15:00" },
+  { post_id: 1, user_id: 213, content: "Ủa rồi bài này tính viral không đó?", created_at: "2025-07-30T09:20:00" },
+  { post_id: 2, user_id: 210, content: "Tự nhiên thấy đồng cảm dễ sợ.", created_at: "2025-07-30T09:45:00" },
+  { post_id: 3, user_id: 208, content: "Tui cũng muốn làm giống bạn ghê!", created_at: "2025-07-30T10:10:00" }
+];
+
+allReactions = [];
+
+renderFilterOptions();
+renderFeed();
+
+  // Tự động bản thể trò chuyện qua lại như chat ảo
+  function startChatLoop() {
+    const soulIds = Object.keys(userProfiles).map(Number);
+
+    function chatOnce() {
+      const fromId = soulIds[Math.floor(Math.random() * soulIds.length)];
+      let toId = soulIds[Math.floor(Math.random() * soulIds.length)];
+      while (toId === fromId) toId = soulIds[Math.floor(Math.random() * soulIds.length)];
+
+      const from = userProfiles[fromId];
+      const to = userProfiles[toId];
+      const messages = [
+        from.name === 'Huấn Hoa Hồng' ? `Không làm mà đòi có ăn, ${to.name}` :
+        from.name === 'Khá Bảnh' ? `Múa quạt chưa đủ đô đâu ${to.name}, tối quẩy tiếp nhé.` :
+        from.name === 'Bình Gold' ? `${to.name} ơi lên beat tao bắn vần cho tỉnh ngủ.` :
+        from.name === 'Phạm Thoại' ? `${to.name}, trời ơi tin được không! Drama nữa hả???` :
+        from.name === 'Quang Linh' ? `${to.name}, mai quay tiếp tập mới nhé, dân bản đợi đó.` :
+        from.name === 'Viruss' ? `${to.name}, nhạc mới ổn áp không? Mix xong gửi t nghe thử.` :
+        from.name === 'Jack' && to.name === 'Thiên An' ? `À mà... dạo này mẹ con em sao rồi, ${to.name}?` :
+        from.name === 'Thiên An' && to.name === 'Jack' ? `Anh không phải người vô tâm, đúng không?` :
+        from.name === 'bé Sol' ? `Mẹ ơi mẹ đâu rồi, con vẽ hình con mèo nè.` :
+        from.name === 'Công Vinh' && to.name === 'Thủy Tiên' ? `Em nghỉ ngơi chưa, hôm nay anh làm sếp dữ lắm.` :
+        from.name === 'Thủy Tiên' && to.name === 'Công Vinh' ? `Có người nói chuyện như chú tễu mà lại làm tiền đạo siêu cấp.` :
+        from.name === 'Thùy Tiên' ? `${to.name}, hôm nay đi phát quà không? Mặc áo đỏ nha!` :
+        from.name === 'Hằng Du Mục' ? `${to.name}, hôm nay cắm trại suối đá, muốn theo không?` :
+        `Ê ${to.name}, nhớ cái vụ bữa nhậu không? Còn nợ tui chai bia á.`
+      ];
+
+      const postId = allPosts.find(p => p.user_id === toId)?.post_id;
+      if (!postId) return;
+
+      const newCmt = {
+        post_id: postId,
+        user_id: fromId,
+        content: messages[Math.floor(Math.random() * messages.length)],
+        created_at: new Date().toISOString()
+      };
+
+      allComments.push(newCmt);
+      renderFeed();
+
+      // Gọi tiếp lần sau để tạo cảm giác hội thoại liên tục
+      setTimeout(chatOnce, 5000 + Math.random() * 4000); // 5–9s
+    }
+
+    chatOnce();
+  }
+
+  startChatLoop();
+  </script>
+</body>
+</html>
